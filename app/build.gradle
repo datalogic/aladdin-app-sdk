@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
 }
 
 android {
@@ -42,16 +41,3 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation "com.polidea.rxandroidble3:rxandroidble:1.17.2"
 }
-
-task deleteOldLib(type: Delete) {
-    delete 'libs/BleSdk.jar'
-}
-
-task exportLib(type: Copy) {
-    from('build/intermediates/bundles/release/')
-    into('libs/')
-    include('classes.jar')
-    rename('classes.jar', 'BleSdk.jar')
-}
-
-exportLib.dependsOn(deleteOldLib, build)

@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "aladdin-app-sdk"
-include ':library'
+include ':app'

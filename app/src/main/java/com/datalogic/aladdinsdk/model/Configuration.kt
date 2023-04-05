@@ -3,15 +3,15 @@ package com.datalogic.aladdinsdk.model
 import kotlin.properties.Delegates
 
 class Configuration {
-    private var vibration by Delegates.notNull<Boolean>()
+    private var vibration = false
     private var volume = 30
-    private var proximity by Delegates.notNull<Boolean>()
+    private var proximity = false
     private lateinit var batteryManagementProfile: String
     private lateinit var standByDelay: String
-    private var fuzzy1dProcessing by Delegates.notNull<Boolean>()
-    private var displayMode by Delegates.notNull<Boolean>()
-    private var pickingListMode by Delegates.notNull<Boolean>()
-    private var unattendedMode by Delegates.notNull<Boolean>()
+    private var fuzzy1dProcessing = false
+    private var displayMode = false
+    private var pickingListMode = false
+    private var unattendedMode = false
 
     fun getVibration(): Boolean {
         return this.vibration
