@@ -3,6 +3,9 @@ package com.datalogic.aladdinsdk.util
 import android.util.Log
 import com.datalogic.aladdinsdk.BuildConfig
 
+/**
+ * This class contains Log util functions
+ */
 class LogUtils {
     companion object {
         private const val LOG_TAG = "BLE_SDK"

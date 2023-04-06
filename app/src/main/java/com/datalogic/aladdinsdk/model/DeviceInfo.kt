@@ -1,5 +1,8 @@
 package com.datalogic.aladdinsdk.model
 
+/**
+ * This class contains Device info fields
+ */
 class DeviceInfo {
     private lateinit var deviceType: String
     private lateinit var firmwareVersion: String
@@ -23,8 +26,15 @@ class DeviceInfo {
     }
 
     companion object {
+        /**
+         * Parse device details from bytearray to DeviceInfo obj
+         */
         fun parseDeviceInfo(value: ByteArray): DeviceInfo {
-            //parse byte array to device info
+            //TODO:parse   array to device info
+            return getDummyDeviceInfoData()
+        }
+
+        fun getDummyDeviceInfoData(): DeviceInfo {
             val deviceInfo = DeviceInfo()
             deviceInfo.deviceType = "Handscanner-1093e"
             deviceInfo.firmwareVersion = "v 1.0"

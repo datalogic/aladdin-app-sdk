@@ -9,6 +9,7 @@ class BLEConstants {
         val BATTERY_MANAGEMENT_UUID: UUID? = UUID.randomUUID()
         val DEVICE_INFO_UUID: UUID? = UUID.randomUUID()
         val CONFIGURATION_UUID: UUID? = UUID.randomUUID()
-        const val LOG_TAG = "BLE_SDK"
+        val CONFIGURATION_SCANNED_UUID: UUID? = UUID.randomUUID()
+        const val isShowDummy = true
     }
 }
