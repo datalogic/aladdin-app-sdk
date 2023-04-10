@@ -1,8 +1,6 @@
 package com.datalogic.aladdinsdk.ble
 
 import android.content.Context
-import android.util.Log
-import android.util.SparseArray
 import com.datalogic.aladdinsdk.constants.BLEConstants
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.BATTERY_MANAGEMENT_UUID
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.CONFIGURATION_SCANNED_UUID
@@ -254,7 +252,7 @@ object BleConnection {
             bleConnection!!.writeCharacteristic(characteristic, dataByte)
                 .onErrorResumeNext { throwable ->
                     if (throwable is BleGattCharacteristicException) {
-                        Log.w(BLEConstants.LOG_TAG, "Failed to send data.")
+                        LogUtils.warn("Failed to send data.")
                         tryReconnection(context).andThen(Single.defer {
                             bleConnection!!.writeCharacteristic(characteristic, dataByte)
                         })
@@ -262,13 +260,13 @@ object BleConnection {
                         Single.error(throwable)
                     }
                 }.doOnSuccess {
-                    Log.d(BLEConstants.LOG_TAG, "On characteristic written success.")
+                    LogUtils.debug("On characteristic written success.")
                 }.doOnError { throwable ->
                     if (throwable !is BleCharacteristicNotFoundException) {
-                        Log.e(BLEConstants.LOG_TAG, "Failed to send data. Drop connection.")
+                        LogUtils.error("Failed to send data. Drop connection.")
                         disconnect()
                     } else {
-                        Log.w(BLEConstants.LOG_TAG, "Failed to send data.")
+                        LogUtils.warn("Failed to send data.")
                     }
                 }.ignoreElement()
         }
@@ -303,7 +301,7 @@ object BleConnection {
 
     private fun tryReconnection(context: Context): Completable {
         return Completable.fromCallable {
-            Log.d(BLEConstants.LOG_TAG, "Attempt reconnection with delay.")
+            LogUtils.debug("Attempt reconnection with delay.")
             connectionState = "reconnecting"
             Unit
         }.andThen(clearConnection()).delay(BLEConstants.RECONNECTION_DELAY, TimeUnit.MILLISECONDS)
