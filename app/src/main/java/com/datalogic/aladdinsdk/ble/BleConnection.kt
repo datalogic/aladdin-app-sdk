@@ -39,7 +39,6 @@ object BleConnection {
     private lateinit var mRxBleDevice: RxBleDevice
     private var connectionSubscription = CompositeDisposable()
     private var bleConnection: RxBleConnection? = null
-    private var connectionState = "disconnected"
     private val protectionLock = ReentrantLock(true)
     private lateinit var batteryManagementCallBack: IBatteryManagementInterface
     private lateinit var deviceInfoCallback: IDeviceInfoInterface
@@ -212,7 +211,7 @@ object BleConnection {
                                     connectionSubscription.clear()
                                 }
                             }
-                            connectionState = "connected"
+                            ConnectionState.setCurrentState(BLEConstants.CONNECTED)
                             connectionSubject.onComplete()
                         }
                     }, { error ->
@@ -228,12 +227,11 @@ object BleConnection {
                             clearConnection().blockingAwait()
 
                             //Don't report disconnection if we are trying to reconnect
-                            if (connectionState == "reconnecting") {
+                            if (ConnectionState.getCurrentState() == BLEConstants.CONNECTING) {
                                 if (!connectionSubject.hasComplete()) {
                                     connectionSubject.onError(error)
                                 }
                             }
-                            connectionState = "disconnected"
                         }
                     })
                 )
@@ -302,7 +300,7 @@ object BleConnection {
     private fun tryReconnection(context: Context): Completable {
         return Completable.fromCallable {
             LogUtils.debug("Attempt reconnection with delay.")
-            connectionState = "reconnecting"
+            ConnectionState.setCurrentState(BLEConstants.CONNECTING)
             Unit
         }.andThen(clearConnection()).delay(BLEConstants.RECONNECTION_DELAY, TimeUnit.MILLISECONDS)
             .andThen(establishConnection(mRxBleDevice, context))
@@ -314,7 +312,7 @@ object BleConnection {
     private fun disconnect(): Completable {
         return Completable.defer {
             clearConnection().andThen(Completable.fromCallable {
-                connectionState = "disconnected"
+                ConnectionState.setCurrentState(BLEConstants.DISCONNECTED)
                 Unit
             })
         }
