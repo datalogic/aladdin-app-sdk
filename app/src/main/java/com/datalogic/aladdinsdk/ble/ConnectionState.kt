@@ -13,7 +13,7 @@ import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.EXTRA_CONNECTIO
 
 @SuppressLint("StaticFieldLeak")
 object ConnectionState {
-    private var currentConnectionState = BLEConstants.DISCONNECTED
+    private var currentConnectionState = BLEConstants.CONNECTED
     private lateinit var mContext: Context
     private val bleBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
