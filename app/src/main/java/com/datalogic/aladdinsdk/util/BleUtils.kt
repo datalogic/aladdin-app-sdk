@@ -17,5 +17,23 @@ class BleUtils {
             val bleManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
             return bleManager.adapter
         }
+
+        /**
+         * convert ASCII to byte array
+         * @param asciiContent String
+         * @return ByteArray after conversion
+         */
+        fun convertAsciiToByteArray(asciiContent: String): ByteArray {
+            return asciiContent.toByteArray()
+        }
+
+        /**
+         * convert byte array to ASCII content
+         * @param byteArray ByteArray
+         * @return ASCII content after conversion
+         */
+        fun convertByteArrayToAscii(byteArray: ByteArray): String {
+            return String(byteArray)
+        }
     }
 }
