@@ -65,6 +65,12 @@ object BleConnection {
         }
     }
 
+    fun disconnectConnection() {
+        LogUtils.debug("disconnecting ble connection")
+        connectionDisposable?.dispose()
+        ConnectionState.setCurrentState(DISCONNECTED)
+    }
+
     /**
      * Send information from aladdin app to hand scanner
      * @param dataByte sending data in form of byte array
