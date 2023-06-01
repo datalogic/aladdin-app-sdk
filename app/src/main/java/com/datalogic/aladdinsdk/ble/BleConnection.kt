@@ -69,6 +69,7 @@ object BleConnection {
         LogUtils.debug("disconnecting ble connection")
         connectionDisposable?.dispose()
         ConnectionState.setCurrentState(DISCONNECTED)
+        mCurrentConnectedDevice = null
     }
 
     fun getCurrentConnectedDevice(): RxBleDevice? {

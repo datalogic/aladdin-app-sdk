@@ -72,4 +72,8 @@ class BleDiscovery(private val context: Context) {
             }
         }
     }
+
+    fun stopScan() {
+        scanDisposable?.dispose()
+    }
 }
