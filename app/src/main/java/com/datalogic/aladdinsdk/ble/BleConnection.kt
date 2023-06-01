@@ -71,6 +71,10 @@ object BleConnection {
         ConnectionState.setCurrentState(DISCONNECTED)
     }
 
+    fun getCurrentConnectedDevice(): RxBleDevice? {
+        return mCurrentConnectedDevice
+    }
+
     /**
      * Send information from aladdin app to hand scanner
      * @param dataByte sending data in form of byte array
