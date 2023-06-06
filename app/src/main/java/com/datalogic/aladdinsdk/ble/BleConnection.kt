@@ -1,14 +1,13 @@
 package com.datalogic.aladdinsdk.ble
 
-import android.content.Context
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.BATTERY_MANAGEMENT_UUID
-import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.CONFIGURATION_SCANNED_UUID
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.CONFIGURATION_UUID
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.CONNECTED
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.DEVICE_INFO_UUID
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.DISCONNECTED
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.isShowDummy
 import com.datalogic.aladdinsdk.listener.IBatteryManagementInterface
+import com.datalogic.aladdinsdk.listener.IConfigurationAck
 import com.datalogic.aladdinsdk.listener.IConfigurationInterface
 import com.datalogic.aladdinsdk.listener.IDeviceInfoInterface
 import com.datalogic.aladdinsdk.model.BatteryManagementProfile
@@ -37,6 +36,7 @@ object BleConnection {
     private lateinit var batteryManagementCallBack: IBatteryManagementInterface
     private lateinit var deviceInfoCallback: IDeviceInfoInterface
     private lateinit var configurationCallback: IConfigurationInterface
+    private var configurationAckCallback: IConfigurationAck? = null
     private var connectionDisposable: Disposable? = null
 
     /**
@@ -45,11 +45,11 @@ object BleConnection {
      */
     fun connect(bleDevice: RxBleDevice) {
         bleDevice.establishConnection(false).doFinally { dispose() }.subscribe({
-                onConnectionReceived()
-                mCurrentConnectedDevice = bleDevice
-            }, {
-                onConnectionFailure(it)
-            }).let { connectionDisposable = it }
+            onConnectionReceived()
+            mCurrentConnectedDevice = bleDevice
+        }, {
+            onConnectionFailure(it)
+        }).let { connectionDisposable = it }
     }
 
     private fun onConnectionReceived() {
@@ -81,7 +81,7 @@ object BleConnection {
      * @param dataByte sending data in form of byte array
      * @param characteristic UUID for the feature
      */
-    fun sendData(dataByte: ByteArray, characteristic: UUID, context: Context): Completable {
+    fun sendData(dataByte: ByteArray, characteristic: UUID): Completable {
         return Completable.defer {
             bleConnection!!.writeCharacteristic(characteristic, dataByte)
                 .onErrorResumeNext { throwable ->
@@ -143,11 +143,11 @@ object BleConnection {
      * Request for battery information to hand scanner
      * @param context Context
      */
-    fun getBatteryManagementInfo(context: Context): BatteryManagementProfile? {
+    fun getBatteryManagementInfo(): BatteryManagementProfile? {
         if (!isShowDummy) {
             BATTERY_MANAGEMENT_UUID?.let {
                 sendData(
-                    byteArrayOf(0), BATTERY_MANAGEMENT_UUID, context
+                    byteArrayOf(0), BATTERY_MANAGEMENT_UUID
                 )
             }
         } else {
@@ -168,9 +168,9 @@ object BleConnection {
      * Request for device information to hand scanner
      * @param context Context
      */
-    fun getDeviceInfo(context: Context): DeviceInfo? {
+    fun getDeviceInfo(): DeviceInfo? {
         if (!isShowDummy) {
-            DEVICE_INFO_UUID?.let { sendData(byteArrayOf(0), DEVICE_INFO_UUID, context) }
+            DEVICE_INFO_UUID?.let { sendData(byteArrayOf(0), DEVICE_INFO_UUID) }
         } else {
             return DeviceInfo.getDummyDeviceInfoData()
         }
@@ -189,9 +189,9 @@ object BleConnection {
      * Request for configuration information to hand scanner
      * @param callback Battery management Interface
      */
-    fun getConfigurationInfo(context: Context): Configuration? {
+    fun getConfigurationInfo(): Configuration? {
         if (!isShowDummy) {
-            CONFIGURATION_UUID?.let { sendData(byteArrayOf(0), CONFIGURATION_UUID, context) }
+            CONFIGURATION_UUID?.let { sendData(byteArrayOf(0), CONFIGURATION_UUID) }
         } else {
             return Configuration.getDummyConfigurationData()
         }
@@ -203,24 +203,9 @@ object BleConnection {
      * @param configData Configuration
      * @param context Context
      */
-    fun sendConfigurationChangedData(configData: Configuration, context: Context) {
+    fun sendConfigurationChangedData(configData: Configuration) {
         if (!isShowDummy) {
-            CONFIGURATION_UUID?.let { sendData(byteArrayOf(0), CONFIGURATION_UUID, context) }
-        }
-    }
-
-    /**
-     * Send configuration scanned barcode from aladdin app to hand scanner
-     * @param callback Battery management Interface
-     * @param context Context
-     */
-    fun sendConfigurationScannedData(barcodeDetails: String, context: Context) {
-        if (!isShowDummy) {
-            CONFIGURATION_SCANNED_UUID?.let {
-                sendData(
-                    byteArrayOf(0), CONFIGURATION_SCANNED_UUID, context
-                )
-            }
+            CONFIGURATION_UUID?.let { sendData(byteArrayOf(0), CONFIGURATION_UUID) }
         }
     }
 
