@@ -1,5 +1,6 @@
 package com.datalogic.aladdinsdk.ble
 
+import com.datalogic.aladdinsdk.constants.BLEConstants
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.BATTERY_MANAGEMENT_UUID
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.CONFIGURATION_UUID
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.CONNECTED
@@ -12,6 +13,7 @@ import com.datalogic.aladdinsdk.listener.IConfigurationInterface
 import com.datalogic.aladdinsdk.listener.IDeviceInfoInterface
 import com.datalogic.aladdinsdk.model.BatteryManagementProfile
 import com.datalogic.aladdinsdk.model.Configuration
+import com.datalogic.aladdinsdk.model.ConfigurationHostToDeviceTemplate
 import com.datalogic.aladdinsdk.model.DeviceInfo
 import com.datalogic.aladdinsdk.util.LogUtils
 import com.polidea.rxandroidble3.RxBleConnection
@@ -206,6 +208,32 @@ object BleConnection {
     fun sendConfigurationChangedData(configData: Configuration) {
         if (!isShowDummy) {
             CONFIGURATION_UUID?.let { sendData(byteArrayOf(0), CONFIGURATION_UUID) }
+        }
+    }
+
+    /**
+     * Send configuration scanned barcode from aladdin app to hand scanner
+     * @param barcodeDetails barcode content
+     * @param confAckCallback IConfigurationAck callback
+     */
+    fun sendConfigurationScannedData(
+        barcodeDetails: String, confAckCallback: IConfigurationAck
+    ) {
+        if (!isShowDummy) {
+            configurationAckCallback = confAckCallback
+            val byteArrForWrite =
+                ConfigurationHostToDeviceTemplate(barcodeDetails).getConfigurationSendingTemplate()
+            sendData(byteArrForWrite, BLEConstants.INPUT_SEGMENT_CHARACTERISTIC_UUID)
+        }
+    }
+
+    private fun readCharacteristicData(byteArray: ByteArray) {
+        val requestId = byteArray[byteArray.size - BLEConstants.NUMERIC_1]
+        when (requestId.toInt()) {
+            BLEConstants.ANSWER_CONFIGURATION_COMMAND -> {
+                configurationAckCallback!!.onConfigurationDataReceived()
+                sendConfigurationScannedData(BLEConstants.EMPTY_STRING, configurationAckCallback!!)
+            }
         }
     }
 
