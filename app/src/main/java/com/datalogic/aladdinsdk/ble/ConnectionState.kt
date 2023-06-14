@@ -26,12 +26,6 @@ object ConnectionState {
                 ) == BluetoothAdapter.STATE_OFF
             ) {
                 setCurrentState(BLEConstants.DISCONNECTED)
-            } else if (intent.getIntExtra(
-                    BluetoothAdapter.EXTRA_STATE, DEFAULT_CONNECTION_STATE
-                ) == BluetoothAdapter.STATE_ON
-            ) {
-                //TODO: updating connection state as connected on bluetooth enable for demo, need to remove
-                setCurrentState(BLEConstants.CONNECTED)
             }
         }
     }

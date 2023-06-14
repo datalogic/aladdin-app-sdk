@@ -231,7 +231,7 @@ object BleConnection {
         val requestId = byteArray[byteArray.size - BLEConstants.NUMERIC_1]
         when (requestId.toInt()) {
             BLEConstants.ANSWER_CONFIGURATION_COMMAND -> {
-                configurationAckCallback!!.onConfigurationDataReceived()
+                configurationAckCallback!!.onConfigurationDataReceivedSuccessfully()
                 sendConfigurationScannedData(BLEConstants.EMPTY_STRING, configurationAckCallback!!)
             }
         }
