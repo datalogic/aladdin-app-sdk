@@ -7,10 +7,7 @@ import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.CONNECTED
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.DEVICE_INFO_UUID
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.DISCONNECTED
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.isShowDummy
-import com.datalogic.aladdinsdk.listener.IBatteryManagementInterface
-import com.datalogic.aladdinsdk.listener.IConfigurationAck
-import com.datalogic.aladdinsdk.listener.IConfigurationInterface
-import com.datalogic.aladdinsdk.listener.IDeviceInfoInterface
+import com.datalogic.aladdinsdk.listener.*
 import com.datalogic.aladdinsdk.model.BatteryManagementProfile
 import com.datalogic.aladdinsdk.model.Configuration
 import com.datalogic.aladdinsdk.model.ConfigurationHostToDeviceTemplate
@@ -224,6 +221,12 @@ object BleConnection {
             val byteArrForWrite =
                 ConfigurationHostToDeviceTemplate(barcodeDetails).getConfigurationSendingTemplate()
             sendData(byteArrForWrite, BLEConstants.INPUT_SEGMENT_CHARACTERISTIC_UUID)
+        }
+    }
+
+    fun startFirmwareUpgrade(firmwareData: ByteArray, firmwareAck: IFirmwareAck) {
+        if (!isShowDummy) {
+
         }
     }
 
