@@ -7,6 +7,10 @@ class BLEConstants {
         const val RECONNECTION_DELAY = 2000L
         const val isShowDummy = true
         const val EMPTY_STRING = ""
+        const val COMMAND_SUCCESS = ">"
+        const val COMMAND_FAILED = "%"
+        const val COMMAND_UNKNOWN = "?"
+        const val COMMA = ","
         const val NUMERIC_1 = 1
         const val CONNECTED = 1
         const val CONNECTING = 2
@@ -27,9 +31,9 @@ class BLEConstants {
         val DEVICE_INFO_UUID: UUID? = UUID.randomUUID()
         val CONFIGURATION_UUID: UUID? = UUID.randomUUID()
         val CONFIGURATION_SCANNED_UUID: UUID? = UUID.randomUUID()
+    }
 
-        enum class ConfigurationFeature(val featureId: String) {
-            VOLUME("BPVO")
-        }
+    enum class ConfigurationFeature(val featureId: String) {
+        VOLUME("BPVO"),
     }
 }

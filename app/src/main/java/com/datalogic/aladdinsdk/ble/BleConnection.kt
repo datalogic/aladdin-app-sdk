@@ -8,10 +8,7 @@ import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.DEVICE_INFO_UUI
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.DISCONNECTED
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.isShowDummy
 import com.datalogic.aladdinsdk.listener.*
-import com.datalogic.aladdinsdk.model.BatteryManagementProfile
-import com.datalogic.aladdinsdk.model.Configuration
-import com.datalogic.aladdinsdk.model.ConfigurationHostToDeviceTemplate
-import com.datalogic.aladdinsdk.model.DeviceInfo
+import com.datalogic.aladdinsdk.model.*
 import com.datalogic.aladdinsdk.util.LogUtils
 import com.polidea.rxandroidble3.RxBleConnection
 import com.polidea.rxandroidble3.RxBleDevice
@@ -37,6 +34,7 @@ object BleConnection {
     private lateinit var configurationCallback: IConfigurationInterface
     private var configurationAckCallback: IConfigurationAck? = null
     private var connectionDisposable: Disposable? = null
+    private var isConfigBulkSend = false
 
     /**
      * establish connection between hand scanner and aladdin app
@@ -123,13 +121,6 @@ object BleConnection {
         }
     }
 
-    private fun readConfigurationData(value: ByteArray) {
-        val configData = Configuration.parseConfiguration(value)
-        if (this::configurationCallback.isInitialized) {
-            configurationCallback.onConfigurationDataReceived(configData)
-        }
-    }
-
     /**
      * set callback for getting battery information into aladdin app
      * @param callback Battery management Interface
@@ -177,38 +168,6 @@ object BleConnection {
     }
 
     /**
-     * set callback for getting configuration information into aladdin app
-     * @param callback configuration management Interface
-     */
-    fun setCallBackForConfiguration(callback: IConfigurationInterface) {
-        configurationCallback = callback
-    }
-
-    /**
-     * Request for configuration information to hand scanner
-     * @param callback Battery management Interface
-     */
-    fun getConfigurationInfo(): Configuration? {
-        if (!isShowDummy) {
-            CONFIGURATION_UUID?.let { sendData(byteArrayOf(0), CONFIGURATION_UUID) }
-        } else {
-            return Configuration.getDummyConfigurationData()
-        }
-        return null
-    }
-
-    /**
-     * Send configuration setting changes from aladdin app to hand scanner
-     * @param configData Configuration
-     * @param context Context
-     */
-    fun sendConfigurationChangedData(configData: Configuration) {
-        if (!isShowDummy) {
-            CONFIGURATION_UUID?.let { sendData(byteArrayOf(0), CONFIGURATION_UUID) }
-        }
-    }
-
-    /**
      * Send configuration scanned barcode from aladdin app to hand scanner
      * @param barcodeDetails barcode content
      * @param confAckCallback IConfigurationAck callback
@@ -217,6 +176,7 @@ object BleConnection {
         barcodeDetails: String, confAckCallback: IConfigurationAck
     ) {
         if (!isShowDummy) {
+            isConfigBulkSend = true
             configurationAckCallback = confAckCallback
             val byteArrForWrite =
                 ConfigurationHostToDeviceTemplate(barcodeDetails).getConfigurationSendingTemplate()
@@ -224,9 +184,18 @@ object BleConnection {
         }
     }
 
+    fun writeConfigurationValues(configCommand: String, configCallback: IConfigurationInterface) {
+        if (!isShowDummy) {
+            configurationCallback = configCallback
+            val byteArrForWrite =
+                ConfigurationHostToDeviceTemplate(configCommand).getConfigurationSendingTemplate()
+            sendData(byteArrForWrite, BLEConstants.INPUT_SEGMENT_CHARACTERISTIC_UUID)
+        }
+    }
+
     fun startFirmwareUpgrade(firmwareData: ByteArray, firmwareAck: IFirmwareAck) {
         if (!isShowDummy) {
-
+            //TODO: Need to integrate firmware upgrade
         }
     }
 
@@ -234,8 +203,30 @@ object BleConnection {
         val requestId = byteArray[byteArray.size - BLEConstants.NUMERIC_1]
         when (requestId.toInt()) {
             BLEConstants.ANSWER_CONFIGURATION_COMMAND -> {
-                configurationAckCallback!!.onConfigurationDataReceivedSuccessfully()
-                sendConfigurationScannedData(BLEConstants.EMPTY_STRING, configurationAckCallback!!)
+                if (isConfigBulkSend) {
+                    if (ConfigurationDeviceToHostTemplate(byteArray).isConfigurationCommandSuccess()) {
+                        configurationAckCallback!!.onConfigurationDataReceivedSuccessfully()
+                        sendConfigurationScannedData(
+                            BLEConstants.EMPTY_STRING,
+                            configurationAckCallback!!
+                        )
+                    } else {
+                        configurationAckCallback!!.onConfigurationDataReceivedUnSuccessful()
+                    }
+                    isConfigBulkSend = false
+                } else {
+                    val template = ConfigurationDeviceToHostTemplate(byteArray)
+                    if (template.isConfigurationCommandSuccess()) {
+                        val configuration = template.getConfigurationDataFromBuffer(template.getDataBuffer())
+                        if (configuration == null) {
+                            configurationCallback!!.onConfigurationWriteSuccessfull()
+                        } else {
+                            configurationCallback!!.onConfigurationDataReceived(configuration)
+                        }
+                    } else {
+                        configurationCallback!!.onConfigurationWriteUnsuccessfull()
+                    }
+                }
             }
         }
     }
