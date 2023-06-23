@@ -7,4 +7,8 @@ import com.datalogic.aladdinsdk.model.Configuration
  */
 interface IConfigurationInterface {
     fun onConfigurationDataReceived(configuration: Configuration)
+
+    fun onConfigurationWriteSuccessfull()
+
+    fun onConfigurationWriteUnsuccessfull()
 }

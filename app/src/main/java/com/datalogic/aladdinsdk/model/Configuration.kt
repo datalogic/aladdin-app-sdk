@@ -5,7 +5,7 @@ package com.datalogic.aladdinsdk.model
  */
 class Configuration {
     private var vibration = false
-    private var volume = 30
+    private var volume = 0
     private var proximity = false
     private lateinit var batteryManagementProfile: String
     private lateinit var standByDelay: String
@@ -84,29 +84,5 @@ class Configuration {
 
     fun setUnattendedMode(value: Boolean) {
         this.unattendedMode = value
-    }
-
-    companion object {
-        /**
-         * Parse configuration details from bytearray to Configuration obj
-         */
-        fun parseConfiguration(value: ByteArray): Configuration {
-            //TODO: parse byte array to configuration info
-            return getDummyConfigurationData()
-        }
-
-        fun getDummyConfigurationData(): Configuration {
-            val configuration = Configuration()
-            configuration.vibration = true
-            configuration.volume = 30
-            configuration.proximity = false
-            configuration.batteryManagementProfile = "Profile 1"
-            configuration.standByDelay = "1 Minute"
-            configuration.fuzzy1dProcessing = false
-            configuration.pickingListMode = false
-            configuration.displayMode = false
-            configuration.unattendedMode = false
-            return configuration
-        }
     }
 }

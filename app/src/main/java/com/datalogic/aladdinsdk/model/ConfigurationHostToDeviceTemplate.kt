@@ -1,8 +1,11 @@
 package com.datalogic.aladdinsdk.model
 
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.CONFIGURATION_MESSAGE_TX_COMPLETE
+import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.DATA_LEN_INFO_LONG_LENGTH
+import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.DATA_LEN_INFO_SHORT_LENGTH
 import com.datalogic.aladdinsdk.constants.BLEConstants.Companion.REQUEST_CONFIGURATION_COMMAND
 import com.datalogic.aladdinsdk.util.BleUtils
+import java.nio.ByteBuffer
 
 /**
  * This class represents template for sending configuration from host to device
@@ -21,10 +24,6 @@ class ConfigurationHostToDeviceTemplate(private val payload: String) {
     private val buf = byteArrayOf(0x62, 0x75, 0x66)
     private val ntfFieldLen = 0xA3
     private val ntf = byteArrayOf(0x6E, 0x74, 0x66)
-
-    //TODO: check below payload field
-    private val dataLenInfo = 0xC4
-    private val dataLen = 0x12
 
     fun getConfigurationSendingTemplate(): ByteArray {
         var confByteArr = ByteArray(totalConfByteArrSize)
@@ -48,9 +47,20 @@ class ConfigurationHostToDeviceTemplate(private val payload: String) {
 
     private fun constructPayload(): ByteArray {
         var payloadArr = ByteArray(payloadFixedSize)
-        payloadArr += dataLenInfo.toByte()
-        payloadArr += dataLen.toByte()
         val confArr = BleUtils.convertAsciiToByteArray(payload)
+        val dataLenInfo = if (confArr.size < 256) {
+            DATA_LEN_INFO_SHORT_LENGTH.toByte()
+        } else {
+            DATA_LEN_INFO_LONG_LENGTH.toByte()
+        }
+        payloadArr += dataLenInfo
+        if (dataLenInfo < DATA_LEN_INFO_SHORT_LENGTH.toByte()) {
+            payloadArr += confArr.size.toByte()
+        } else {
+            var dataLenArr = ByteArray(2)
+            dataLenArr = ByteBuffer.allocate(Int.SIZE_BYTES).putInt(confArr.size).array()
+            payloadArr += dataLenArr
+        }
         payloadArr += confArr
         return payloadArr
     }
