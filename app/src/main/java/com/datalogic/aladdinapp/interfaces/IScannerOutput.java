@@ -4,5 +4,4 @@ public interface IScannerOutput {
     void onBarcodeScanned(String data);
     void onScannerConnected();
     void onScannerDisconnected();
-    void onScannerStateChanged();
 }
