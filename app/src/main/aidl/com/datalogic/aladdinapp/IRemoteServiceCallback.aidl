@@ -13,6 +13,4 @@ interface IRemoteServiceCallback {
    void onScannerConnected();
 
    void onScannerDisconnected();
-
-   void onScannerStateChanged();
 }

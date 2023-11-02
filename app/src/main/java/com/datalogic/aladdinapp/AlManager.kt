@@ -5,6 +5,8 @@ import android.content.ComponentName
 import android.content.Context
 import android.os.IBinder
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.os.RemoteException
 import com.datalogic.aladdinapp.interfaces.IScannerOutput
 import com.datalogic.aladdinapp.interfaces.IServiceOutput
@@ -13,13 +15,13 @@ import kotlin.Throws
 open class AlManager(private val context: Context) {
     var isConnectedToService = false
         private set
-    private var myService1: IMyAidlInterface? = null
+    private var myService: IMyAidlInterface? = null
     private var iServiceOutput: IServiceOutput? = null
     private var iScannerOutput: IScannerOutput? = null
 
     private val connection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            myService1 = IMyAidlInterface.Stub.asInterface(service)
+            myService = IMyAidlInterface.Stub.asInterface(service)
             isConnectedToService = true
             if (iServiceOutput != null) iServiceOutput!!.onServiceConnected()
         }
@@ -31,11 +33,13 @@ open class AlManager(private val context: Context) {
     }
 
     fun ensureConnectionToService(): Boolean {
-        val intent = Intent()
-        intent.setClassName(
-            "com.datalogic.aladdin", "com.datalogic.aladdinapp.data.model.EndlessService"
-        )
-        isConnectedToService = context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        if (!isConnectedToService) {
+            val intent = Intent()
+            intent.setClassName(
+                "com.datalogic.aladdin", "com.datalogic.aladdinapp.data.model.EndlessService"
+            )
+            isConnectedToService = context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
         return isConnectedToService
     }
 
@@ -46,7 +50,7 @@ open class AlManager(private val context: Context) {
     val isConnectedToScanner: Boolean
         get() {
             try {
-                return if (myService1 != null) myService1!!.isConnectedToScanner else false
+                return if (myService != null) myService!!.isConnectedToScanner else false
             } catch (e: RemoteException) {
                 e.printStackTrace()
             }
@@ -56,7 +60,7 @@ open class AlManager(private val context: Context) {
     fun subscribeToScans(scannerOutput: IScannerOutput?) {
         iScannerOutput = scannerOutput
         try {
-            if (myService1 != null) myService1!!.SubscribeScans(iRemoteServiceCallback)
+            if (myService != null) myService!!.SubscribeScans(iScannerServiceCallback)
         } catch (e: RemoteException) {
             e.printStackTrace()
         }
@@ -69,7 +73,7 @@ open class AlManager(private val context: Context) {
     fun unsubscribeFromScans() {
         iScannerOutput = null
         try {
-            myService1!!.UnsubscribeScans(iRemoteServiceCallback)
+            myService!!.UnsubscribeScans(iScannerServiceCallback)
         } catch (e: RemoteException) {
             e.printStackTrace()
         }
@@ -82,32 +86,30 @@ open class AlManager(private val context: Context) {
 
     fun getLatestBarcodeData(): String {
         try {
-            return myService1!!.qrCode
+            return myService!!.qrCode
         } catch (e: RemoteException) {
             e.printStackTrace()
         }
         return "Default Data"
     }
 
-    var iRemoteServiceCallback: IRemoteServiceCallback = object : IRemoteServiceCallback.Stub() {
+    var iScannerServiceCallback: IRemoteServiceCallback = object : IRemoteServiceCallback.Stub() {
         @Throws(RemoteException::class)
         override fun onBarcodeScanned(message: String) {
-            iScannerOutput!!.onBarcodeScanned(message)
+            val mainHandler = Handler(Looper.getMainLooper());
+            mainHandler.post { iScannerOutput!!.onBarcodeScanned(message) }
         }
 
         @Throws(RemoteException::class)
         override fun onScannerConnected() {
-            iScannerOutput!!.onScannerConnected()
+            val mainHandler = Handler(Looper.getMainLooper());
+            mainHandler.post { iScannerOutput!!.onScannerConnected() }
         }
 
         @Throws(RemoteException::class)
         override fun onScannerDisconnected() {
-            iScannerOutput!!.onScannerDisconnected()
-        }
-
-        @Throws(RemoteException::class)
-        override fun onScannerStateChanged() {
-            iScannerOutput!!.onScannerStateChanged()
+            val mainHandler = Handler(Looper.getMainLooper());
+            mainHandler.post { iScannerOutput!!.onScannerDisconnected() }
         }
     }
 }
