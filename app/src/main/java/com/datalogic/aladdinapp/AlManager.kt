@@ -32,7 +32,11 @@ open class AlManager(private val context: Context) {
         }
     }
 
-    fun ensureConnectionToService(): Boolean {
+    /*
+    * Connect to the Aladdin Connect SDK Service, if not connected already.
+    * Triggers a Service Binding via (AIDL) IPC to the Aladdin App. Will automatically re-establish the connection if necessary.
+    * */
+    fun ensureConnectionToService(context: Context): Boolean {
         if (!isConnectedToService) {
             val intent = Intent()
             intent.setClassName(
@@ -43,10 +47,9 @@ open class AlManager(private val context: Context) {
         return isConnectedToService
     }
 
-    fun unbindService() {
-        context.unbindService(connection)
-    }
-
+    /*
+    * To check scanner is connected to Aladdin app or not
+    * */
     val isConnectedToScanner: Boolean
         get() {
             try {
@@ -57,6 +60,9 @@ open class AlManager(private val context: Context) {
             return false
         }
 
+    /*
+   * subscribe to scan events
+   * */
     fun subscribeToScans(scannerOutput: IScannerOutput?) {
         iScannerOutput = scannerOutput
         try {
@@ -66,10 +72,16 @@ open class AlManager(private val context: Context) {
         }
     }
 
+    /*
+   * subscribe to service events
+   * */
     fun subscribeToServiceEvents(serviceOutput: IServiceOutput?) {
         iServiceOutput = serviceOutput
     }
 
+    /*
+   * unsubscribe from scan events
+   * */
     fun unsubscribeFromScans() {
         iScannerOutput = null
         try {
@@ -79,20 +91,28 @@ open class AlManager(private val context: Context) {
         }
     }
 
+    /*
+    * unsubscribe from service events
+    * */
     fun unsubscribeFromServiceEvents() {
         iServiceOutput = null
-
     }
 
+    /*
+    * To get last bar code value
+    * */
     fun getLatestBarcodeData(): String {
         try {
             return myService!!.qrCode
         } catch (e: RemoteException) {
             e.printStackTrace()
         }
-        return "Default Data"
+        return "Error"
     }
 
+    /*
+    * Callback listeners to get Scan data
+    * */
     var iScannerServiceCallback: IRemoteServiceCallback = object : IRemoteServiceCallback.Stub() {
         @Throws(RemoteException::class)
         override fun onBarcodeScanned(message: String) {
