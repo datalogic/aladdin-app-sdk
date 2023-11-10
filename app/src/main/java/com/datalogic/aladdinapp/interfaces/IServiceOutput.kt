@@ -1,8 +1,13 @@
-package com.datalogic.aladdinapp.interfaces;
+package com.datalogic.aladdinapp.interfaces
 
-public interface IServiceOutput {
-    void onServiceConnected();
-    void onServiceDisconnected();
+
+interface IServiceOutput {
+    /*
+    * Callback for the successful ServiceConnection
+    * */
+    fun onServiceConnected()
+    /*
+    * Callback for a disconnection from the service.
+    * */
+    fun onServiceDisconnected()
 }
-
-
