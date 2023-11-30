@@ -16,6 +16,7 @@ open class AlManager() {
     private var myService: IMyAidlInterface? = null
     private var iServiceOutput: IServiceOutput? = null
     private var iScannerOutput: IScannerOutput? = null
+    private var icontext: Context? = null
 
     private val connection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
@@ -37,16 +38,28 @@ open class AlManager() {
     * Triggers a Service Binding via (AIDL) IPC to the Aladdin App.
     * Will automatically re-establish the connection if necessary.
     * */
-    fun ensureConnectionToService(context: Context): Boolean {
+    fun connectToService(context: Context): Boolean {
         if (!connectedToService) {
+            icontext = context;
             val intent = Intent()
             intent.setClassName(
                 "com.datalogic.aladdin", "com.datalogic.aladdinapp.data.model.EndlessService"
             )
-            connectedToService = context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-            LogUtils.debug("Client_app_Sdk", "ensureConnectionToService")
+            LogUtils.debug("Client_app_Sdk", "connectToService")
+            return context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
         }
         return connectedToService
+    }
+
+    /*
+    * To unbind sdk from the service
+    * */
+    fun disconnectFromService() {
+        icontext?.unbindService(connection);
+        connectedToService = false;
+        unsubscribeFromScans()
+        unsubscribeFromServiceEvents()
+        LogUtils.debug("Client_app_Sdk", "unBindFromService")
     }
 
     /*
@@ -78,6 +91,8 @@ open class AlManager() {
         iScannerOutput = scannerOutput
         try {
             if (myService != null) myService!!.SubscribeScans(iScannerServiceCallback)
+            else
+                LogUtils.debug("Client_app_Sdk", "subscribeToScans myService null")
         } catch (e: RemoteException) {
             e.printStackTrace()
         }
@@ -99,7 +114,11 @@ open class AlManager() {
         iScannerOutput = null
         try {
             LogUtils.debug("Client_app_Sdk", "SDK before unsubscribe enter")
-            myService!!.UnsubscribeScans(iScannerServiceCallback)
+            if (myService != null)
+                myService!!.UnsubscribeScans(iScannerServiceCallback)
+            else
+                LogUtils.debug("Client_app_Sdk", "unsubscribeFromScans myService null")
+
             LogUtils.debug("Client_app_Sdk", "SDK before unsubscribe exit")
         } catch (e: RemoteException) {
             LogUtils.debug("Client_app_Sdk", e.message.toString())
@@ -119,11 +138,14 @@ open class AlManager() {
     * */
     fun getLatestBarcodeData(): String {
         try {
-            return myService!!.qrCode
+            if (myService != null)
+                return myService!!.qrCode
+            else
+                return ""
         } catch (e: RemoteException) {
             e.printStackTrace()
         }
-        return "Error"
+        return ""
     }
 
     /*
