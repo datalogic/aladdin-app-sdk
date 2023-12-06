@@ -10,6 +10,7 @@ import android.os.Looper
 import android.os.RemoteException
 import com.datalogic.aladdinapp.interfaces.IScannerOutput
 import com.datalogic.aladdinapp.interfaces.IServiceOutput
+import com.datalogic.aladdinapp.model.BarcodeModel
 
 open class AlManager() {
     private var connectedToService = false
@@ -55,8 +56,10 @@ open class AlManager() {
     * To unbind sdk from the service
     * */
     fun disconnectFromService() {
+        LogUtils.debug("Client_app_Sdk", "disconnectFromService")
         icontext?.unbindService(connection);
         connectedToService = false;
+        isConnectedToScanner
         unsubscribeFromScans()
         unsubscribeFromServiceEvents()
         LogUtils.debug("Client_app_Sdk", "unBindFromService")
@@ -67,6 +70,7 @@ open class AlManager() {
     * */
     val isConnectedToScanner: Boolean
         get() {
+            LogUtils.debug("Client_app_Sdk", "isConnectedToScanner")
             try {
                 return if (myService != null) myService!!.isConnectedToScanner else false
             } catch (e: RemoteException) {
@@ -151,13 +155,19 @@ open class AlManager() {
     /*
     * Callback listeners to get Scan data
     * */
-    var iScannerServiceCallback: IRemoteServiceCallback = object : IRemoteServiceCallback.Stub() {
+    var iScannerServiceCallback: ScannerEventListener = object : ScannerEventListener.Stub() {
         @Throws(RemoteException::class)
-        override fun onBarcodeScanned(message: String) {
+
+        override fun onBarcodeScanned(barcode: String?, code: String?, scanTime: Long) {
             LogUtils.debug("Client_app_Sdk", "onBarcodeScanned")
             val mainHandler = Handler(Looper.getMainLooper());
-            mainHandler.post { iScannerOutput!!.onBarcodeScanned(message) }
-        }
+            mainHandler.post {
+                val barCodeModel = BarcodeModel()
+                barCodeModel.barcode = barcode
+                barCodeModel.code = code
+                barCodeModel.scanTime = scanTime
+                iScannerOutput!!.onBarcodeScanned(barCodeModel)}
+            }
 
         @Throws(RemoteException::class)
         override fun onScannerConnected() {
