@@ -1,7 +1,7 @@
 // IMyAidlInterface.aidl
-package com.datalogic.aladdinapp;
+package com.datalogic.aladdin;
 
-import com.datalogic.aladdinapp.IRemoteServiceCallback;
+import com.datalogic.aladdin.IRemoteServiceCallback;
 
 // Declare any non-default types here with import statements
 

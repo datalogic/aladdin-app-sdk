@@ -1,4 +1,4 @@
-package com.datalogic.aladdinapp.interfaces
+package com.datalogic.aladdin.interfaces
 
 interface IScannerOutput {
     /*

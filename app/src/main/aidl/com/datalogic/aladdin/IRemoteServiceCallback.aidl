@@ -1,5 +1,5 @@
 // IRemoteServiceCallback.aidl
-package com.datalogic.aladdinapp;
+package com.datalogic.aladdin;
 
 // Declare any non-default types here with import statements
 

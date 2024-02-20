@@ -1,4 +1,4 @@
-package com.datalogic.aladdinapp
+package com.datalogic.aladdin
 
 import android.util.Log
 
