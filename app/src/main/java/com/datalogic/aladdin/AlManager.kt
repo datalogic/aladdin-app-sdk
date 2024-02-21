@@ -1,4 +1,4 @@
-package com.datalogic.aladdinapp
+package com.datalogic.aladdin
 
 import android.content.ComponentName
 import android.content.Context
@@ -8,8 +8,8 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.RemoteException
-import com.datalogic.aladdinapp.interfaces.IScannerOutput
-import com.datalogic.aladdinapp.interfaces.IServiceOutput
+import com.datalogic.aladdin.interfaces.IScannerOutput
+import com.datalogic.aladdin.interfaces.IServiceOutput
 
 open class AlManager() {
     private var connectedToService = false
@@ -41,7 +41,7 @@ open class AlManager() {
         if (!connectedToService) {
             val intent = Intent()
             intent.setClassName(
-                "com.datalogic.aladdin", "com.datalogic.aladdinapp.data.model.EndlessService"
+                "com.datalogic.aladdin", "com.datalogic.aladdin.data.model.EndlessService"
             )
             connectedToService = context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
             LogUtils.debug("Client_app_Sdk", "ensureConnectionToService")
