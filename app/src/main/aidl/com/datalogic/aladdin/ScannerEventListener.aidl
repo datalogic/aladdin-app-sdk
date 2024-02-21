@@ -1,14 +1,14 @@
-// IRemoteServiceCallback.aidl
+// ScannerEventListener.aidl
 package com.datalogic.aladdin;
 
 // Declare any non-default types here with import statements
 
-interface IRemoteServiceCallback {
+interface ScannerEventListener {
     /**
      * Demonstrates some basic types that you can use as parameters
      * and return values in AIDL.
      */
-   void onBarcodeScanned(String message);
+   void onBarcodeScanned(String barcode,String code,long scanTime);
 
    void onScannerConnected();
 
