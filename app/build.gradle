@@ -1,7 +1,10 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
+
+def libVersion = "1.0"
 
 android {
     namespace 'com.datalogic.aladdinsdk'
@@ -11,7 +14,7 @@ android {
         minSdk 21
         targetSdk 33
         versionCode 1
-        versionName "0.1"
+        versionName libVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,4 +43,18 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
+}
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'com.github.datalogic'
+            artifactId = 'aladdin-sdk'
+            version = libVersion
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
 }
