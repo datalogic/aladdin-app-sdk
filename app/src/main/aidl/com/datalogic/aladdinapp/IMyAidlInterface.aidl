@@ -1,7 +1,7 @@
 // IMyAidlInterface.aidl
-package com.datalogic.aladdin;
+package com.datalogic.aladdinapp;
 
-import com.datalogic.aladdin.ScannerEventListener;
+import com.datalogic.aladdinapp.ScannerEventListener;
 
 // Declare any non-default types here with import statements
 

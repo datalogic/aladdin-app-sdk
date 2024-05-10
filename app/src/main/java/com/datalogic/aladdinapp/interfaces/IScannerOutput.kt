@@ -1,6 +1,6 @@
-package com.datalogic.aladdin.interfaces
+package com.datalogic.aladdinapp.interfaces
 
-import com.datalogic.aladdin.model.BarcodeModel
+import com.datalogic.aladdinapp.model.BarcodeModel
 
 interface IScannerOutput {
     /*

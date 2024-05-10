@@ -1,5 +1,5 @@
 // ScannerEventListener.aidl
-package com.datalogic.aladdin;
+package com.datalogic.aladdinapp;
 
 // Declare any non-default types here with import statements
 

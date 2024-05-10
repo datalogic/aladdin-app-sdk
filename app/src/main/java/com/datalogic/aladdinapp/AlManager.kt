@@ -1,4 +1,4 @@
-package com.datalogic.aladdin
+package com.datalogic.aladdinapp
 
 import android.content.ComponentName
 import android.content.Context
@@ -8,9 +8,9 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.os.RemoteException
-import com.datalogic.aladdin.interfaces.IScannerOutput
-import com.datalogic.aladdin.interfaces.IServiceOutput
-import com.datalogic.aladdin.model.BarcodeModel
+import com.datalogic.aladdinapp.interfaces.IScannerOutput
+import com.datalogic.aladdinapp.interfaces.IServiceOutput
+import com.datalogic.aladdinapp.model.BarcodeModel
 
 open class AlManager() {
     private var connectedToService = false
@@ -44,7 +44,7 @@ open class AlManager() {
             icontext = context;
             val intent = Intent()
             intent.setClassName(
-                "com.datalogic.aladdin", "com.datalogic.aladdin.data.model.EndlessService"
+                "com.datalogic.aladdinapp", "com.datalogic.aladdinapp.data.model.EndlessService"
             )
             LogUtils.debug("Client_app_Sdk", "connectToService")
             return context.bindService(intent, connection, Context.BIND_AUTO_CREATE)

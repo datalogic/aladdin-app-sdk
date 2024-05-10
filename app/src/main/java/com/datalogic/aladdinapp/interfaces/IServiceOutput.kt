@@ -1,4 +1,4 @@
-package com.datalogic.aladdin.interfaces
+package com.datalogic.aladdinapp.interfaces
 
 
 interface IServiceOutput {
