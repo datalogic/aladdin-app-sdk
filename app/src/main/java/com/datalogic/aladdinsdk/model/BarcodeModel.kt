@@ -1,4 +1,4 @@
-package com.datalogic.aladdinapp.model
+package com.datalogic.aladdinsdk.model
 
 class BarcodeModel {
     var barcode: String? = null

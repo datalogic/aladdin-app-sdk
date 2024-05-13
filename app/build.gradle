@@ -4,17 +4,15 @@ plugins {
     id 'maven-publish'
 }
 
-def libVersion = "1.0"
-
 android {
     namespace 'com.datalogic.aladdinsdk'
-    compileSdk 33
+    compileSdk 30
 
     defaultConfig {
         minSdk 21
-        targetSdk 33
-        versionCode 1
-        versionName libVersion
+        aarMetadata {
+            minCompileSdk 30
+        }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,33 +24,31 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
+    }
+    buildFeatures {
+        aidl true
     }
 }
 
 dependencies {
-
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-
 }
 
-publishing {
-    publications {
-        release(MavenPublication) {
-            groupId = 'com.github.datalogic'
-            artifactId = 'aladdin-sdk'
-            version = libVersion
+afterEvaluate {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId "com.github.datalogic"
+                artifactId = "aladdin-sdk"
+                version = "1.0"
 
-            afterEvaluate {
                 from components.release
             }
         }
