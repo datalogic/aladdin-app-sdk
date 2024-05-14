@@ -4,15 +4,8 @@
 
     <queries>
         <intent>
-            <action android:name="com.datalogic.aladdin.data.model.EndlessService" />
+            <action android:name="com.datalogic.aladdinapp.data.model.EndlessService" />
         </intent>
     </queries>
-
-    <application
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:supportsRtl="true"
-        tools:targetApi="31" />
 
 </manifest>
