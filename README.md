@@ -1,7 +1,7 @@
 # aladdin-app-sdk
 [![Release](https://jitpack.io/v/datalogic/aladdin-app-sdk.svg)](https://jitpack.io/#datalogic/aladdin-app-sdk)
 
-SDK repository for Android integration with the Aladdin application.
+SDK repository for Android integration with the [Aladdin](https://github.com/datalogic/aladdin-v2) application.
 
 Follow the steps below to add to your Android project.
 
